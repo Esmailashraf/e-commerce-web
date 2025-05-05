@@ -46,7 +46,7 @@ namespace e_commerce_web.Controllers
             {
                 CategoryId = category.CategoryId,
                 Name = category.Name,
-                Products = category.Products
+                Products = category.Products  ?? new List<Product>()
             };
             return Ok(categoryResponseDto);
         }
@@ -62,7 +62,7 @@ namespace e_commerce_web.Controllers
             {
                 CategoryId = c.CategoryId,
                 Name = c.Name,
-                Products = c.Products
+                Products = c.Products ?? new List<Product>()
             }).ToList();
             return Ok(categoryResponseDtos);
         }

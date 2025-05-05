@@ -20,7 +20,14 @@ namespace e_commerce_web
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ApplicationDbcontext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            //builder.Services.AddControllers().AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            //    options.JsonSerializerOptions.WriteIndented = true;
+            //});
+
             builder.Services.AddScoped<ICategoryRepository, SqlCategoryRepository>();
+            builder.Services.AddScoped<IProductRepository, SqlProductRepository>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

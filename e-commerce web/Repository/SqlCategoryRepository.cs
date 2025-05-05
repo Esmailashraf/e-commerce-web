@@ -33,18 +33,16 @@ namespace e_commerce_web.Repository
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-            var categories = await _dbContext.Categories.ToListAsync();
-            if (categories == null || !categories.Any())
-            {
-                return null;
-            }
-            return categories;
+
+            return await _dbContext.Categories.Include(u=>u.Products).ToListAsync();
+
+           
 
         }
 
         public async Task<Category?> GetCategoryByIdAsync(Guid categoryId)
         {
-            var existingCategory = await _dbContext.Categories.FindAsync(categoryId);
+            var existingCategory = await _dbContext.Categories.Include(u => u.Products).FirstOrDefaultAsync(u=>u.CategoryId==categoryId);
             if (existingCategory == null)
             {
                 return null;

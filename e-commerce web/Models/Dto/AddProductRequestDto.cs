@@ -1,15 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using e_commerce_web.Models.Domain;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace e_commerce_web.Models.Domain
+namespace e_commerce_web.Models.Dto
 {
-    public class Product
+    public class AddProductRequestDto
     {
-      
-        public Guid ProductId { get; set; }
-
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, ErrorMessage = "Product name cannot be longer than 100 characters.")]
         public string Name { get; set; }
@@ -27,9 +24,7 @@ namespace e_commerce_web.Models.Domain
         [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative.")]
         public int StockQuantity { get; set; }
 
-        [ValidateNever]
-        [JsonIgnore]
-        public Category Category { get; set; }
+        [Required]
         public Guid CategoryId { get; set; }
     }
 }
