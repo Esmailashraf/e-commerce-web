@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace e_commerce_web.Models.Domain
 {
     public class Product
     {
-        [Key]
-        public int ProductId { get; set; }
+      
+        public Guid ProductId { get; set; }
 
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, ErrorMessage = "Product name cannot be longer than 100 characters.")]
@@ -26,5 +27,7 @@ namespace e_commerce_web.Models.Domain
         public int StockQuantity { get; set; }
 
         public Category? Category { get; set; }
+        [ValidateNever]
+        public Guid CategoryId { get; set; }
     }
 }
