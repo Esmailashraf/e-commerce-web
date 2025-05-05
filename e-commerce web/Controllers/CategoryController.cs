@@ -50,5 +50,49 @@ namespace e_commerce_web.Controllers
             };
             return Ok(categoryResponseDto);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await categoryRepository.GetAllAsync();
+            if (categories == null || !categories.Any())
+            {
+                return NotFound();
+            }
+            var categoryResponseDtos = categories.Select(c => new GetCategoriesResponseDto()
+            {
+                CategoryId = c.CategoryId,
+                Name = c.Name,
+                Products = c.Products
+            }).ToList();
+            return Ok(categoryResponseDtos);
+        }
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateCategory([FromRoute] Guid id, [FromBody] UpdateCategoryRequestDto categoryRequestDto)
+        {
+            var existingCategory = new Category()
+            {
+                Name = categoryRequestDto.Name
+
+            };
+            existingCategory = await categoryRepository.UpdateAsync(id, existingCategory);
+
+            if (existingCategory == null)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] Guid id)
+        {
+            var isDeleted = await categoryRepository.DeleteAsync(id);
+            if (!isDeleted)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
     }
 }

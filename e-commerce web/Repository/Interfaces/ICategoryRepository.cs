@@ -6,5 +6,8 @@ namespace e_commerce_web.Repository.Interfaces
     {
         Task<Category>CreateAsync(Category category);
         Task<Category?> GetCategoryByIdAsync(Guid categoryId);
+        Task<IEnumerable<Category>> GetAllAsync();
+        Task<Category?> UpdateAsync(Guid id,Category category);
+        Task<bool> DeleteAsync(Guid id);
     }
 }
