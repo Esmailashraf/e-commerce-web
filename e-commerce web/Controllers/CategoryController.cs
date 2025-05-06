@@ -1,6 +1,8 @@
 ﻿using e_commerce_web.Models.Domain;
 using e_commerce_web.Models.Dto;
 using e_commerce_web.Repository.Interfaces;
+using e_commerce_web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,7 @@ namespace e_commerce_web.Controllers
             this.categoryRepository = categoryRepository;
         }
         [HttpPost]
+        [RoleAuthorize("User")]
         public async Task<IActionResult> AddCategory([FromBody] AddCategoryRequestDto categoryRequestDto)
         {
 

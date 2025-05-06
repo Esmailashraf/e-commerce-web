@@ -1,4 +1,5 @@
 
+using System.Security.Claims;
 using System.Text;
 using e_commerce_web.Data;
 using e_commerce_web.Models.Domain;
@@ -18,15 +19,24 @@ namespace e_commerce_web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerDocumentation();
             builder.Services.AddDbContext<ApplicationDbcontext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbcontext>()
                 .AddDefaultTokenProviders();
@@ -41,27 +51,62 @@ namespace e_commerce_web
                 options.Password.RequiredUniqueChars = 1;
                 options.SignIn.RequireConfirmedEmail = true;
             });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("User", policy => policy.RequireRole("User"));
+                options.AddPolicy("Vendor", policy => policy.RequireRole("Vendor"));
+
+
+            });
+
+
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-                    };
-                });
+      .AddJwtBearer(options =>
+      {
+          options.TokenValidationParameters = new TokenValidationParameters
+          {
+              ValidateLifetime = true,
+              ValidateIssuer = true,
+              ValidateAudience = true,
+              ValidateIssuerSigningKey = true,
+              ValidIssuer = builder.Configuration["Jwt:Issuer"],
+              ValidAudience = builder.Configuration["Jwt:Audience"],
+              IssuerSigningKey = new SymmetricSecurityKey(
+                  Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+              RoleClaimType = ClaimTypes.Role
+          };
+
+          options.Events = new JwtBearerEvents
+          {
+              OnChallenge = context =>
+              {
+                  // Skip the default logic.
+                  context.HandleResponse();
+                  context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                  context.Response.ContentType = "application/json";
+                  return context.Response.WriteAsync("{\"error\": \"Unauthorized\"}");
+              },
+              OnForbidden = context =>
+              {
+                  context.Response.StatusCode = StatusCodes.Status401Unauthorized; // or 403, up to you
+                  context.Response.ContentType = "application/json";
+                  return context.Response.WriteAsync("{\"error\": \"Forbidden - you do not have access\"}");
+              }
+          };
+      });
+
+
 
             builder.Services.AddScoped<ICategoryRepository, SqlCategoryRepository>();
             builder.Services.AddScoped<IProductRepository, SqlProductRepository>();
             builder.Services.AddScoped<ITokenServices, TokenServices>();
-            var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+
+            var app = builder.Build();
+            app.UseCors("AllowAllOrigins");
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -70,8 +115,9 @@ namespace e_commerce_web
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
