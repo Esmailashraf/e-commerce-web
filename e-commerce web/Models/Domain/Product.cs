@@ -31,5 +31,11 @@ namespace e_commerce_web.Models.Domain
         [JsonIgnore]
         public Category Category { get; set; }
         public Guid CategoryId { get; set; }
+
+        [JsonIgnore]
+        public List<CartItem> CartItems { get; set; } = new List<CartItem>();
+
+
+
     }
 }
