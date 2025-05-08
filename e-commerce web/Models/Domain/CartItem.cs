@@ -6,7 +6,7 @@ namespace e_commerce_web.Models.Domain
 {
     public class CartItem
     {
-        public int CartItemId { get; set; }
+        public int  CartItemId { get; set; }
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
@@ -24,9 +24,10 @@ namespace e_commerce_web.Models.Domain
         [ValidateNever]
         public Cart Cart { get; set; }
         public Guid CartId { get; set; }
-        public Guid ProductId { get; set; }           
+
         [ValidateNever]
-        public Product Product { get; set; }
+        public ICollection<Product> products { get; set; } = new List<Product>();
+
 
 
 

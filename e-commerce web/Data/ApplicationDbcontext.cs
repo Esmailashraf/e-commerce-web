@@ -60,9 +60,9 @@ namespace e_commerce_web.Data
                 .HasForeignKey(ci => ci.CartId);
 
             modelBuilder.Entity<CartItem>()
-                .HasOne(ci => ci.Product)
-                .WithMany(p => p.CartItems)
-                .HasForeignKey(ci => ci.ProductId);
+                .HasMany(ci => ci.products)
+                .WithOne(p => p.CartItem)
+                .HasForeignKey(ci => ci.CartItemId);
 
 
 

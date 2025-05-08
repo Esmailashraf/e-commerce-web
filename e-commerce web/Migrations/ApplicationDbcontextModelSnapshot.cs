@@ -282,17 +282,12 @@ namespace e_commerce_web.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("CartItemId");
 
                     b.HasIndex("CartId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("CartItems");
                 });
@@ -319,6 +314,9 @@ namespace e_commerce_web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("CartItemId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
@@ -339,6 +337,8 @@ namespace e_commerce_web.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ProductId");
+
+                    b.HasIndex("CartItemId");
 
                     b.HasIndex("CategoryId");
 
@@ -415,24 +415,22 @@ namespace e_commerce_web.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("e_commerce_web.Models.Domain.Product", "Product")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cart");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("e_commerce_web.Models.Domain.Product", b =>
                 {
+                    b.HasOne("e_commerce_web.Models.Domain.CartItem", "CartItem")
+                        .WithMany("products")
+                        .HasForeignKey("CartItemId");
+
                     b.HasOne("e_commerce_web.Models.Domain.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CartItem");
 
                     b.Navigation("Category");
                 });
@@ -448,14 +446,14 @@ namespace e_commerce_web.Migrations
                     b.Navigation("CartItems");
                 });
 
+            modelBuilder.Entity("e_commerce_web.Models.Domain.CartItem", b =>
+                {
+                    b.Navigation("products");
+                });
+
             modelBuilder.Entity("e_commerce_web.Models.Domain.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("e_commerce_web.Models.Domain.Product", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 #pragma warning restore 612, 618
         }
